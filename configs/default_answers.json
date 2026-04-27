@@ -1,0 +1,25 @@
+{
+  "profile": {
+    "name": "Bharath Mogalapu",
+    "city": "Hyderabad",
+    "linkedin": "https://www.linkedin.com/in/bharathmogalapu",
+    "github": "https://github.com/bharathmogalapu",
+    "years_of_experience": 1,
+    "current_ctc_lpa": 8.1,
+    "current_ctc_inr": 810000,
+    "expected_ctc_lpa": 12,
+    "expected_ctc_inr": 1200000,
+    "notice_period_days": 30,
+    "immediate_joiner": true,
+    "open_to_relocation": true,
+    "cover_letter": "I am excited to apply for this role and bring my Python development expertise."
+  },
+  "common_answers": {
+    "do_you_have_experience": "Yes",
+    "are_you_immediate_joiner": "Yes",
+    "notice_period": "30",
+    "authorized_to_work": "Yes",
+    "require_sponsorship": "No",
+    "willing_to_work_onsite": "Yes"
+  }
+}

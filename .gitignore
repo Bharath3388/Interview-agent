@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.venv/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp / Audio
+/tmp/
+*.wav
+*.webm
+
+# Next.js
+interview-ui/.next/
+interview-ui/node_modules/
+interview-ui/out/
+
+# Logs
+*.log
+
+# Model cache
+models/
+.cache/
+
+# Project-specific
+linkedin_profile/

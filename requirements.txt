@@ -1,0 +1,26 @@
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+websockets==13.1
+python-multipart==0.0.17
+
+# LLM — Groq
+groq>=0.11.0
+
+# TTS — Kokoro
+kokoro>=0.3.4
+soundfile==0.12.1
+
+# Document parsing
+PyPDF2==3.0.1
+python-docx==1.1.2
+
+# Utilities
+pydantic>=2.9.2
+python-dotenv==1.0.1
+numpy>=1.26.4
+
+# Auth & Database
+sqlalchemy>=2.0.0
+bcrypt>=4.0.0
+python-jose[cryptography]>=3.3.0
