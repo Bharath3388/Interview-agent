@@ -1,0 +1,9 @@
+interview-ui/
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+*.db
+node_modules/
+.vercel/

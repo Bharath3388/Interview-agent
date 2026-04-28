@@ -68,7 +68,7 @@ export async function apiGetSessionDetail(sessionId: string): Promise<{ session_
 
 // ---- WebSocket ----
 // WebSocket must connect directly to the FastAPI backend (Next.js rewrites don't proxy WS)
-const WS_HOST = process.env.NEXT_PUBLIC_WS_HOST || "localhost:8000";
+const WS_HOST = process.env.NEXT_PUBLIC_WS_HOST || process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:\/\//, "") || "localhost:8000";
 
 export function createInterviewWS(sessionId: string): WebSocket {
   const protocol = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";

@@ -42,8 +42,8 @@ interview-ui/out/
 # Logs
 *.log
 
-# Model cache
-models/
+# Model cache (top-level only, not app/models/)
+/models/
 .cache/
 
 # Project-specific

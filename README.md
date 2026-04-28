@@ -2,11 +2,18 @@
 
 An AI-powered mock interview system with real-time voice interaction. Upload your resume, paste a job description, and practice with an adaptive AI interviewer that scores every answer, asks follow-ups, and generates a detailed performance report.
 
+### Live Demo
+
+| Service | URL |
+|---------|-----|
+| **Frontend** | [interview-agent-iota.vercel.app](https://interview-agent-iota.vercel.app) |
+| **Backend API** | [interview-api-production-031d.up.railway.app](https://interview-api-production-031d.up.railway.app) |
+
 ---
 
 ## Features
 
-- **Voice Output** — AI interviewer speaks questions aloud via Kokoro TTS
+- **Voice Output** — AI interviewer speaks questions aloud via Edge TTS
 - **Adaptive Questioning** — Groq LLM generates context-aware questions and probing follow-ups
 - **Resume & JD Parsing** — Upload PDF/DOCX resume and paste any job description
 - **Live Evaluation** — Every answer scored on 4 dimensions in real-time
@@ -30,7 +37,7 @@ An AI-powered mock interview system with real-time voice interaction. Upload you
 └─────────────┬───────────┼───────────────────────────────────────────┘
               │           │
 ┌─────────────▼───────────▼───────────────────────────────────────────┐
-│                     FASTAPI BACKEND (port 8000)                     │
+│               FASTAPI BACKEND (Railway)                             │
 │                                                                     │
 │   api/                                                              │
 │   ├── auth_routes.py    POST /api/auth/register, /login, GET /me   │
@@ -43,13 +50,13 @@ An AI-powered mock interview system with real-time voice interaction. Upload you
 │   └── nodes.py          generate_question → evaluate → decide_next │
 │                                                                     │
 │   core/security.py      JWT + bcrypt password hashing               │
-│   db/                   SQLAlchemy models + CRUD (SQLite)           │
+│   db/                   SQLAlchemy models + CRUD (PostgreSQL)       │
 │                                                                     │
 └──────────┬─────────────────────────┬────────────────────────────────┘
            │                         │
     ┌──────▼──────┐           ┌──────▼──────┐
-    │  Kokoro TTS │           │   Groq API  │
-    │  (local CPU)│           │   (LLM)     │
+    │  Edge TTS   │           │   Groq API  │
+    │  (cloud)    │           │   (LLM)     │
     └─────────────┘           └─────────────┘
 ```
 
@@ -61,8 +68,8 @@ User speaks/types answer
   → Agent evaluates the answer (Groq LLM)
   → Agent decides: follow-up? next topic? end?
   → Agent generates next question (Groq LLM)
-  → Kokoro TTS synthesizes speech
-  → Base64 WAV returned over WebSocket
+  → Edge TTS synthesizes speech
+  → Base64 audio returned over WebSocket
   → AudioContext decodes and plays in browser
   → Avatar animates while speaking
 ```
@@ -98,7 +105,7 @@ Interview-agent/
 │   │
 │   ├── services/                   # External service wrappers
 │   │   ├── llm.py                  # Groq LLM (questions, evaluation, reports)
-│   │   ├── tts.py                  # Kokoro TTS (text → WAV audio)
+│   │   ├── tts.py                  # Edge TTS (text → audio via MS cloud)
 │   │   └── resume_parser.py        # PDF / DOCX → plain text
 │   │
 │   └── db/                         # Database layer
@@ -127,6 +134,11 @@ Interview-agent/
 ├── linkedin_test.py                # LinkedIn Easy Apply automation (separate tool)
 ├── requirements.txt                # Python dependencies
 ├── .env.example                    # Environment variable template
+├── Dockerfile                      # Backend container for Railway
+├── Procfile                        # Railway start command
+├── railway.json                    # Railway build config
+├── nixpacks.toml                   # Nixpacks system deps (ffmpeg)
+├── .dockerignore                   # Docker build exclusions
 └── .gitignore
 ```
 
@@ -139,9 +151,10 @@ Interview-agent/
 | **Backend** | FastAPI + Uvicorn | Async HTTP + WebSocket server |
 | **Frontend** | Next.js 14 + Tailwind CSS | Modern React UI with dark theme |
 | **LLM** | Groq API (Llama 3.3 70B) | Question generation, evaluation, reports |
-| **TTS** | Kokoro 82M | Local CPU text-to-speech |
+| **TTS** | Edge TTS (Microsoft) | Cloud text-to-speech (zero memory) |
 | **STT** | Browser Web Speech API | Client-side speech recognition |
-| **Database** | SQLite + SQLAlchemy | User accounts, session history |
+| **Database** | PostgreSQL + SQLAlchemy | User accounts, session history (Railway) |
+| **Hosting** | Vercel + Railway | Frontend on Vercel, backend on Railway |
 | **Auth** | JWT + bcrypt | Stateless authentication |
 | **PDF Parsing** | PyPDF2 + python-docx | Resume text extraction |
 
@@ -197,6 +210,28 @@ npm run dev
 ```
 
 Open **http://localhost:3000** in your browser.
+
+### 5. Deploy to production
+
+The app is deployed as a split architecture:
+
+**Frontend → Vercel:**
+```bash
+cd interview-ui
+vercel --prod
+# Set env vars in Vercel dashboard:
+#   NEXT_PUBLIC_API_URL=https://interview-api-production-031d.up.railway.app
+#   NEXT_PUBLIC_WS_HOST=interview-api-production-031d.up.railway.app
+```
+
+**Backend → Railway:**
+```bash
+cd ..
+railway up
+# Set env vars in Railway dashboard:
+#   DATABASE_URL (auto-linked from Railway Postgres)
+#   GROQ_API_KEY, JWT_SECRET, ALLOWED_ORIGINS
+```
 
 ---
 
@@ -311,8 +346,10 @@ See [.env.example](.env.example) for all options:
 | `JWT_SECRET` | Recommended | auto-generated | Secret for signing JWTs |
 | `ALLOWED_ORIGINS` | No | `localhost:3000,8000` | CORS allowed origins |
 | `GROQ_MODEL` | No | `llama-3.3-70b-versatile` | Groq model name |
-| `TTS_VOICE` | No | `af_heart` | Kokoro voice ID |
-| `DATABASE_URL` | No | `sqlite:///interview_agent.db` | Database connection |
+| `TTS_VOICE` | No | `en-US-AvaMultilingualNeural` | Edge TTS voice name |
+| `DATABASE_URL` | No | `sqlite:///interview_agent.db` | Database URL (use PostgreSQL in prod) |
+| `NEXT_PUBLIC_API_URL` | No (Vercel) | `http://localhost:8000` | Backend URL for Next.js rewrites |
+| `NEXT_PUBLIC_WS_HOST` | No (Vercel) | `localhost:8000` | WebSocket host for direct WS connection |
 | `MAX_FOLLOW_UPS` | No | `2` | Follow-ups before moving on |
 | `DEFAULT_DURATION` | No | `15` | Default interview minutes |
 
@@ -350,7 +387,7 @@ introduction → technical → technical → experience → technical → behavi
 | "GROQ_API_KEY not set" | Set it in `.env` — get one at [console.groq.com](https://console.groq.com/keys) |
 | JWT sessions lost on restart | Set a fixed `JWT_SECRET` in `.env` |
 | CORS errors | Add your frontend URL to `ALLOWED_ORIGINS` in `.env` |
-| TTS fails | `pip install --upgrade kokoro soundfile` |
+| TTS fails | `pip install --upgrade edge-tts` |
 | Port 8000 in use | `lsof -i :8000` then `kill <PID>`, or set `PORT=8001` in `.env` |
 | Browser mic not working | Allow microphone in browser settings, use HTTPS or localhost |
 | Audio won't play | Click anywhere on the page first (AudioContext policy) |
@@ -362,16 +399,18 @@ introduction → technical → technical → experience → technical → behavi
 | Component | Cost |
 |-----------|------|
 | Groq API (Llama 3.3 70B) | Free tier: 30 req/min |
-| Kokoro TTS | Free (local) |
+| Edge TTS (Microsoft) | Free (cloud) |
 | Browser STT | Free (client-side) |
+| Railway (backend) | Free tier: 500 hrs/month |
+| Vercel (frontend) | Free tier: unlimited |
 | **Per interview** | **~$0.00 on free tier** |
 
 ---
 
 ## License
 
-- **Kokoro TTS** — Apache 2.0
 - **FastAPI** — MIT
 - **Next.js** — MIT
+- **Edge TTS** — MIT
 
 The Groq API has its own [terms of service](https://groq.com/terms-of-use/).

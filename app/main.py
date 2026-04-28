@@ -28,7 +28,7 @@ app = FastAPI(
 )
 
 # CORS — restrict in production via ALLOWED_ORIGINS env var
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000").split(",")
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000,https://interview-agent-iota.vercel.app").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in allowed_origins],
