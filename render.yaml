@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: interview-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free          # change to starter/standard if you need more resources
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: interview-db
+          property: connectionString
+      - key: GROQ_API_KEY
+        sync: false       # set manually in Render dashboard
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false       # set to your Vercel frontend URL, e.g. https://interview-agent-iota.vercel.app
+      - key: TTS_VOICE
+        value: af_heart
+      - key: TTS_LANGUAGE
+        value: a
+
+databases:
+  - name: interview-db
+    databaseName: interview_agent
+    user: interview_user
+    plan: free
