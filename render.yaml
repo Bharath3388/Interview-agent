@@ -4,28 +4,22 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    plan: free          # change to starter/standard if you need more resources
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: interview-db
-          property: connectionString
+        value: postgresql://neondb_owner:npg_ZDzqGNT0XWS1@ep-delicate-water-atdebqgm-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
       - key: GROQ_API_KEY
         sync: false       # set manually in Render dashboard
       - key: GROQ_MODEL
         value: llama-3.3-70b-versatile
       - key: JWT_SECRET
-        generateValue: true
+        value: odjKy2adBwIKpKAj-zlYp92tyddvy5sAzsIYdoYQZwE
       - key: ALLOWED_ORIGINS
-        sync: false       # set to your Vercel frontend URL, e.g. https://interview-agent-iota.vercel.app
+        value: https://interview-agent-iota.vercel.app,https://interview-agent.vercel.app,http://localhost:3000
       - key: TTS_VOICE
         value: af_heart
       - key: TTS_LANGUAGE
         value: a
-
-databases:
-  - name: interview-db
-    databaseName: interview_agent
-    user: interview_user
-    plan: free
+      - key: PORT
+        value: "8000"
