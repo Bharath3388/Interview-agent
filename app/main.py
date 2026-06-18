@@ -39,6 +39,12 @@ app.add_middleware(
 # Initialise database tables on startup
 init_db()
 
+# Health check for Render / load balancers
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 # API + WebSocket
 app.include_router(auth_router)
 app.include_router(router)
